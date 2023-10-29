@@ -1,0 +1,117 @@
+{
+    "python.defaultInterpreterPath": "C:\\Users\\SLAlnazarov\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "python.languageServer": "Pylance",
+    "vim.easymotion": true,
+    "vim.incsearch": true,
+    "vim.useSystemClipboard": true,
+    "vim.useCtrlKeys": true,
+    "vim.hlsearch": true,
+    "vim.leader": "<space>",
+    "vim.normalModeKeyBindings": [
+        {
+            "before": [
+                "leader",
+                "w"
+            ],
+            "commands": [
+                "workbench.action.files.save",
+            ]
+        },
+        {
+            "before": [
+                "leader",
+                "b"
+            ],
+            "commands": [
+                "editor.debug.action.toggleBreakpoint",
+            ]
+        },
+        {
+            "before": [
+                "leader",
+                "s",
+                "b",
+            ],
+            "commands": [
+                "editor.action.selectToBracket",
+            ]
+        },
+        {
+            "before": [
+                "leader",
+                "d"
+            ],
+            "commands": [
+                "workbench.action.debug.start",
+            ]
+        },
+        {
+            "before": [
+                "leader",
+                "c",
+                "c"
+            ],
+            "commands": [
+                "workbench.debug.panel.action.clearReplAction",
+            ]
+        },
+        {
+            "before": [
+                "leader",
+                "r",
+                "p"
+            ],
+            "commands": [
+                "python.execInTerminal-icon",
+            ]
+        },
+        {
+            "before": [
+                "leader",
+                "c",
+                "t"
+            ],
+            "commands": [
+                "workbench.action.terminal.clear",
+            ]
+        },
+    ],
+    "vim.insertModeKeyBindings": [
+        {
+            "before": [
+                "j",
+                "j"
+            ],
+            "after": [
+                "<Esc>"
+            ]
+        },
+    ],
+    "vim.visualModeKeyBindings": [
+        {
+            "before": [
+                ">"
+            ],
+            "commands": [
+                "editor.action.indentLines"
+            ]
+        },
+        {
+            "before": [
+                "<"
+            ],
+            "commands": [
+                "editor.action.outdentLines"
+            ]
+        },
+    ],
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.python",
+        "editor.formatOnSave": true
+    },
+    "editor.defaultFormatter": "ms-python.autopep8",
+    "autopep8.showNotifications": "onError",
+    "[jsonc]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+}
