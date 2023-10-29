@@ -1,0 +1,166 @@
+Import-Module PSReadLine
+Set-PSReadLineOption -PredictionSource History
+Set-PSReadLineKeyHandler -Key Tab -Function Complete
+Set-PSReadLineOption -PredictionViewStyle ListView
+Set-PSReadLineOption -EditMode Windows
+
+
+function Edit-DataMashup {
+ param (
+     [Parameter(Mandatory=$True, Position=0)]
+     [string]$File
+ )
+
+ $originalMashup = Export-DataMashup -Raw $File -ErrorAction Stop
+       
+ $tempFile = New-TemporaryFile -ErrorAction Stop
+       
+ try {
+     $tempFile = Rename-Item $tempFile ($tempFile.Name + ".m") -PassThru -ErrorAction Stop
+
+     $originalMashup | Out-File $tempFile -NoNewline -ErrorAction Stop
+     Start-Process "code" "`"$($tempFile)`"" -Wait 
+     $postEditMashup = Get-Content $tempFile -Raw -ErrorAction Stop
+           
+     if ($originalMashup -eq $postEditMashup) { 
+         $successful = $true
+         return
+     }
+           
+     Import-DataMashup -Raw $File -Experimental -Mashup $postEditMashup -ErrorAction Stop
+     $successful = $true
+ }   
+ finally {
+     if ($successful -ne $true) {
+         Write-Error "Failed to Save Modified Power Query mashup:`r`n$($postEditMashup)"
+     }
+      
+     Remove-Item $tempFile
+ }
+ }
+ set-alias np 'C:\Program Files\Notepad++\notepad++.exe'
+ 
+ function prompt {
+(Get-Host).UI.RawUI.WindowTitle="PS $(Get-Location)"
+"PS > "
+}
+
+# Import the Chocolatey Profile that contains the necessary code to enable
+# tab-completions to function for `choco`.
+# Be aware that if you are missing these lines from your profile, tab completion
+# for `choco` will not function.
+# See https://ch0.co/tab-completion for details.
+$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+if (Test-Path($ChocolateyProfile)) {
+  Import-Module "$ChocolateyProfile"
+}
+
+
+function touch {if((Test-Path -Path ($args[0])) -eq $false)
+{Set-Content -Path ($args[0]) -Value ($null)} else
+{(Get-Item ($args[0])).LastWriteTime = Get-Date } } 
+
+
+
+#oh-my-posh init pwsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/illusi0n.omp.json' | Invoke-Expression
+#oh-my-posh init pwsh --config 'C:\Users\slalnazarov\AppData\Local\oh-my-posh\config.omp.json' | Invoke-Expression
+
+#Aliases
+Set-Alias tt tree
+Set-Alias ll ls
+Set-Alias g git
+Set-Alias vim nvim
+
+function Move-MyDirectory {
+    param (
+        [string]$Source,
+        [string]$Destination
+    )
+    Move-Item -Path $Source -Destination $Destination
+}
+
+New-Alias -Name MoveDir -Value Move-MyDirectory
+
+
+
+function Change-ToDeveloperDirectory {
+    Set-Location -Path 'V:\Findep\Incoming\test\DevOps'
+}
+function Change-ToFinanceDirectory {
+    Set-Location -Path 'V:\Findep\Work\FINDEP HMCIS\PL'
+}
+function Change-ToMertzDirectory {
+    Set-Location -Path 'V:\Accounting\Work\Мерц\'
+}
+
+function Change-ToPydir {
+    Set-Location -Path 'C:\Users\slalnazarov\Documents\Python'
+}
+
+function Change-ToNvimdir {
+    Set-Location -Path 'C:\Users\salnazarov\AppData\Local\nvim'
+}
+
+New-Alias -Name todevops -Value Change-ToDeveloperDirectory
+New-Alias -Name tofinancedir -Value Change-ToFinanceDirectory
+New-Alias -Name tomertzdir -Value Change-ToMertzDirectory
+New-Alias -Name topydir -Value Change-ToPydir
+New-Alias -Name tonvim -Value Change-ToNvimdir
+
+#Terminal-Icons
+Import-Module Terminal-Icons
+
+#Import-Module PSReadline
+#Set-PSReadLineKeyHandler -Key Tab -Function Complete
+#Set-PSReadlineOption -PredictionViewStyle ListView
+
+function whereis ($command) {
+	Get-Command -Name $command -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue
+
+	}
+
+
+
+function Get-FileModificationInfo {
+    param (
+        [string]$Path = (Get-Location),
+        [int]$ColumnWidth = 30
+    )
+
+    $data = @()
+
+    Get-ChildItem -Path $Path -Recurse | ForEach-Object {
+        $file = $_
+        $acl = Get-Acl -Path $file.FullName
+        $owner = $acl.Owner
+        $lastWriteTime = $file.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")
+        $data += [PSCustomObject]@{
+            'File Name'     = ($file.Name).Substring(0, [Math]::Min($file.Name.Length, $ColumnWidth - 2))
+            'Full Path'     = ($file.FullName).Substring(0, [Math]::Min($file.FullName.Length, $ColumnWidth - 2))
+            'Owner'         = ($owner).Substring(0, [Math]::Min($owner.Length, $ColumnWidth - 2))
+            'Last Modified' = $lastWriteTime
+        }
+    }
+
+    $border = "+" + ("-" * ($ColumnWidth) * 4) + "+"
+    Write-Host $border
+
+    "File Name", "Full Path", "Owner", "Last Modified" | ForEach-Object {
+        Write-Host "| $($_.PadRight($ColumnWidth - 2))" -NoNewline
+    }
+    Write-Host "|"
+
+    Write-Host $border
+
+    $data | ForEach-Object {
+        Write-Host "| $($_.'File Name'.PadRight($ColumnWidth - 2))| $($_.'Full Path'.PadRight($ColumnWidth - 2))| $($_.'Owner'.PadRight($ColumnWidth - 2))| $($_.'Last Modified'.PadRight($ColumnWidth - 2))|"
+    }
+
+    Write-Host $border
+}
+
+
+
+Set-Alias -Name gfm -Value Get-FileModificationInfo
+
+Set-PSReadLineOption -Colors $ISETheme
